@@ -1,10 +1,17 @@
 import { useRef } from 'react';
-import { Animated, Image, PanResponder, useWindowDimensions } from "react-native";
+import { 
+  Animated, 
+  Image, 
+  PanResponder, 
+  useWindowDimensions,
+  View
+} from "react-native";
 
 const MAX_HEIGHT = 500;
 const RATIO_WIDTH = 2.5/3.5;
 
 export const Card = ({
+  stack,
   card,
   onSwipe,
 }: any) =>  {
@@ -28,7 +35,7 @@ export const Card = ({
         { useNativeDriver: false }
       ),
       onPanResponderRelease: (_, gestureState) => {
-        console.log('gestureState', gestureState)
+        // console.log('gestureState', gestureState)
         if (gestureState.dx > 100 || gestureState.vx > 1) {
           console.log('swipe right')
           Animated.spring(pan, {
@@ -37,7 +44,7 @@ export const Card = ({
             speed: 100,
           }).start(() => {
             onSwipe(card)
-            pan.setValue({ x: 0, y: 0 })
+            // pan.setValue({ x: 0, y: 0 })
             // remove card from list
           })
         } else if (gestureState.dx < -100 || gestureState.vx < -1) {
@@ -48,7 +55,7 @@ export const Card = ({
             speed: 100,
           }).start(() => {
             onSwipe(card)
-            pan.setValue({ x: 0, y: 0 })
+            // pan.setValue({ x: 0, y: 0 })
             // remove card from list
           })
         } else {
@@ -58,19 +65,18 @@ export const Card = ({
             useNativeDriver: true
           }).start()
         }
-        console.log('pan', pan)
       }
     })
   ).current;
 
-  return (
+  const renderItem = () => (
     <Animated.View
       style={[
         {
           transform: [{ translateX: pan.x }],
           width: RATIO_WIDTH * MAX_HEIGHT, 
           height: MAX_HEIGHT,
-          marginTop: 10
+          marginTop: 10, 
         }
       ]}
       {...panResponder.panHandlers}
@@ -85,4 +91,18 @@ export const Card = ({
       />
     </Animated.View>
   )
+
+  return stack ? (
+    <View style={{
+      position: "absolute", 
+      left: 0,
+      right: 0, 
+      top: 0,
+      bottom: 0,
+      alignItems: "center",
+      justifyContent: "center"
+    }}>
+      {renderItem()}
+    </View>
+  ) : renderItem();
 }
